@@ -7,12 +7,6 @@ export type AnswersType = {
 };
 
 export interface Task {
-  // index?: number;
-  // total?: number;
-  // word?: string;
-  // mixedChars?: string[];
-  // selectedChars?: string[];
-  // errors?: number;
   wordsTasks: Array<string>;
   mixedTasks: Array<string>;
   answers: Array<AnswersType> | [];
