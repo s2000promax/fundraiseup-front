@@ -1,6 +1,6 @@
-import { AnswersType, Task } from '@/types/model';
+import { AnswersType, Direction, Model, Task } from '@/types/model';
 
-export class SimulatorModel {
+export class SimulatorModel implements Model {
   private words: string[];
   private size: number;
 
@@ -90,7 +90,7 @@ export class SimulatorModel {
     return mixedArray;
   }
 
-  changeCurrentTask(direct: string): number {
+  changeCurrentTask(direct: Direction): number {
     if (direct === 'ArrowLeft') {
       if (this.tasks.currentTask > 1) {
         this.tasks.currentTask -= 1;
