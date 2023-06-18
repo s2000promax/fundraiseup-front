@@ -13,4 +13,6 @@ export interface Task {
   currentTask: number;
 }
 
+export type Direction = 'ArrowLeft' | 'ArrowRight';
+
 export interface Model {}

@@ -1,4 +1,4 @@
-import { AnswersType, Task } from "@/types/model";
+import { Task } from '@/types/model';
 
 export class Statistics {
   getWordsWithoutErrors(tasks: Task): number {
@@ -24,7 +24,10 @@ export class Statistics {
   getWordsMostErrors(tasks: Task) {
     let maxIndexOfErrors = 0;
     for (let index = 1; index < tasks.answers.length; index += 1) {
-      if (tasks.answers[index].errorCounter > tasks.answers[maxIndexOfErrors].errorCounter) {
+      if (
+        tasks.answers[index].errorCounter >
+        tasks.answers[maxIndexOfErrors].errorCounter
+      ) {
         maxIndexOfErrors = index;
       }
     }
@@ -32,12 +35,17 @@ export class Statistics {
     const maxError = tasks.answers[maxIndexOfErrors].errorCounter;
 
     const resultArray = [];
-    for (let index = 0; index < tasks.answers.length; index += 1) {
-      if (tasks.answers[index].errorCounter === maxError) {
-        resultArray.push(tasks.answers[index].answer.text);
+
+    if (maxError !== 0) {
+      for (let index = 0; index < tasks.answers.length; index += 1) {
+        if (tasks.answers[index].errorCounter === maxError) {
+          resultArray.push(tasks.answers[index].answer.text);
+        }
       }
+    } else {
+      resultArray.push('No errors');
     }
 
-    return resultArray.join(',');
+    return resultArray.join(', ');
   }
 }

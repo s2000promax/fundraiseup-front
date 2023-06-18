@@ -1,6 +1,7 @@
 import { Task } from '@/types/model';
+import { View } from '@/types/view';
 
-export class SimulatorDOMView {
+export class SimulatorDOMView implements View {
   private answerElement: HTMLElement | null;
   private lettersElement: HTMLElement | null;
   private currentQuestionElement: HTMLElement | null;
@@ -20,31 +21,25 @@ export class SimulatorDOMView {
   }
 
   render(task: Task) {
-    if (task.currentTask <= task.wordsTasks.length) {
-      this.renderCurrentQueston(task);
-      this.renderTotalQueston(task);
-      this.renderLetters(task);
-      this.renderAnswer(task);
-    }
-    // } else {
-    //   console.log(task.wordsTasks.length, 'statistics33');
-    //   this.renderStatistics(task);
-    // }
+    this.renderCurrentQuestion(task);
+    this.renderTotalQuestion(task);
+    this.renderLetters(task);
+    this.renderAnswer(task);
   }
 
-  renderCurrentQueston(task: Task) {
+  private renderCurrentQuestion(task: Task) {
     if (this.currentQuestionElement) {
       this.currentQuestionElement.innerHTML = String(task.currentTask);
     }
   }
 
-  renderTotalQueston(task: Task) {
+  private renderTotalQuestion(task: Task) {
     if (this.totalQuestionsElement) {
       this.totalQuestionsElement.innerHTML = String(task.wordsTasks.length);
     }
   }
 
-  renderAnswer(task: Task): void {
+  private renderAnswer(task: Task): void {
     if (this.answerElement) {
       this.answerElement.innerHTML = '';
       task.answers[task.currentTask - 1].answer.text
@@ -56,7 +51,6 @@ export class SimulatorDOMView {
           } else {
             charElement.classList.add('btn', 'btn-success', 'm-1');
           }
-
           charElement.textContent = char;
 
           this.answerElement?.appendChild(charElement);
@@ -64,7 +58,7 @@ export class SimulatorDOMView {
     }
   }
 
-  renderLetters(task: Task): void {
+  private renderLetters(task: Task): void {
     if (this.lettersElement) {
       this.lettersElement.innerHTML = '';
       task.mixedTasks[task.currentTask - 1].split('').forEach((char, index) => {
@@ -78,21 +72,21 @@ export class SimulatorDOMView {
               const element = document.querySelector(`#button-${index}`);
               if (element?.classList.contains('btn-danger')) {
                 element.classList.remove('btn-danger');
-                element.classList.add('btn-light');
+                element.classList.add('btn-primary');
               }
             }, 300);
           } else {
-            charElement.classList.add('btn', 'btn-light', 'm-1');
+            charElement.classList.add('btn', 'btn-primary', 'm-1');
           }
         } else {
-          charElement.classList.add('btn', 'btn-light', 'm-1');
+          charElement.classList.add('btn', 'btn-primary', 'm-1');
         }
 
         charElement.id = `button-${index}`;
         charElement.textContent = char;
 
         charElement.addEventListener('click', () => {
-          this.handleSymbolClick(char, index);
+          this.handleClickEvent(char, index);
         });
 
         this.lettersElement?.appendChild(charElement);
@@ -103,32 +97,38 @@ export class SimulatorDOMView {
   registerSymbolClickHandler(
     handler: (char: string, index: number) => void
   ): void {
-    this.handleSymbolClick = handler;
+    this.handleClickEvent = handler;
   }
 
   registerKeyboardClickHandler(handler: (key: KeyboardEvent) => void): void {
     document.addEventListener('keydown', handler);
-    this.handleKeyboardClick = handler;
+    this.handleClickEvent = handler;
   }
 
-  handleSymbolClick(char: string, index: number): void {}
+  handleClickEvent(event: string | KeyboardEvent, index?: number): void {}
 
-  handleKeyboardClick(key: KeyboardEvent): void {}
-
-  renderStatistics(stat1: number, stat2: number, stat3: string): void {
+  renderStatistics(
+    statParam1: number,
+    statParam2: number,
+    statParam3: string
+  ): void {
     if (this.statisticsElement) {
       this.statisticsElement.innerHTML = '';
       const header = document.createElement('h1');
       header.innerText = 'Statistics';
+      header.style.textTransform = 'upperCase';
       const wordsWithoutErrors = document.createElement('div');
       wordsWithoutErrors.innerHTML = `
         <span>Number of collected words without errors: </span>
-        <span>${stat1}</span>`;
+        <strong>${statParam1}</strong>`;
       const countErrors = document.createElement('div');
-      countErrors.innerHTML = `<span>Number of errors: </span><span>${stat2}</span>`;
+      countErrors.innerHTML = `
+        <span>Number of errors: </span>
+        <strong>${statParam2}</strong>`;
       const wordMostErrors = document.createElement('div');
-      wordMostErrors.innerHTML = `<span>The word with the most errors: </span><span>${stat3}</span>`;
-      console.log(stat3);
+      wordMostErrors.innerHTML = `
+        <span>Words with the most errors: </span>
+        <strong>${statParam3}</strong>`;
       this.statisticsElement.append(
         header,
         wordsWithoutErrors,
