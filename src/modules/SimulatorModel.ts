@@ -120,7 +120,7 @@ export class SimulatorModel {
     if (originalWord[this.tasks.answers[currentIndex].stepCounter] === char) {
       this.tasks.mixedTasks[currentIndex] = this.getNewMixedTask(
         this.tasks.mixedTasks[currentIndex],
-        char,
+        char
       );
 
       this.tasks.answers[currentIndex].answer.text += char;
@@ -156,7 +156,7 @@ export class SimulatorModel {
   taskStatus(isComplete?: boolean) {
     if (typeof isComplete !== 'undefined') {
       this.isComplete = isComplete;
-    };
+    }
     return this.isComplete;
   }
 
@@ -174,6 +174,8 @@ export class SimulatorModel {
   }
 
   getLetterIndex(letter: string): number {
-    return this.tasks.mixedTasks[this.tasks.currentTask - 1].split('').findIndex(el => el === letter);
+    return this.tasks.mixedTasks[this.tasks.currentTask - 1]
+      .split('')
+      .findIndex((el) => el === letter);
   }
 }

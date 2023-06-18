@@ -47,18 +47,20 @@ export class SimulatorDOMView {
   renderAnswer(task: Task): void {
     if (this.answerElement) {
       this.answerElement.innerHTML = '';
-      task.answers[task.currentTask - 1].answer.text.split('').forEach((char) => {
-        const charElement = document.createElement('button');
-        if (task.answers[task.currentTask - 1].answer.isWrong) {
-          charElement.classList.add('btn', 'btn-danger', 'm-1');
-        } else {
-          charElement.classList.add('btn', 'btn-success', 'm-1');
-        }
+      task.answers[task.currentTask - 1].answer.text
+        .split('')
+        .forEach((char) => {
+          const charElement = document.createElement('button');
+          if (task.answers[task.currentTask - 1].answer.isWrong) {
+            charElement.classList.add('btn', 'btn-danger', 'm-1');
+          } else {
+            charElement.classList.add('btn', 'btn-success', 'm-1');
+          }
 
-        charElement.textContent = char;
+          charElement.textContent = char;
 
-        this.answerElement?.appendChild(charElement);
-      });
+          this.answerElement?.appendChild(charElement);
+        });
     }
   }
 
@@ -99,7 +101,7 @@ export class SimulatorDOMView {
   }
 
   registerSymbolClickHandler(
-    handler: (char: string, index: number) => void,
+    handler: (char: string, index: number) => void
   ): void {
     this.handleSymbolClick = handler;
   }
@@ -109,18 +111,11 @@ export class SimulatorDOMView {
     this.handleKeyboardClick = handler;
   }
 
-  handleSymbolClick(char: string, index: number): void {
-  }
+  handleSymbolClick(char: string, index: number): void {}
 
-  handleKeyboardClick(key: KeyboardEvent): void {
-  }
+  handleKeyboardClick(key: KeyboardEvent): void {}
 
   renderStatistics(stat1: number, stat2: number, stat3: string): void {
-    /*
-    - Число собранных слов без ошибок.
-- Число ошибок.
-- Слово с самым большим числом ошибок.
-     */
     if (this.statisticsElement) {
       this.statisticsElement.innerHTML = '';
       const header = document.createElement('h1');
@@ -134,9 +129,12 @@ export class SimulatorDOMView {
       const wordMostErrors = document.createElement('div');
       wordMostErrors.innerHTML = `<span>The word with the most errors: </span><span>${stat3}</span>`;
       console.log(stat3);
-      this.statisticsElement.append(header, wordsWithoutErrors, countErrors, wordMostErrors);
+      this.statisticsElement.append(
+        header,
+        wordsWithoutErrors,
+        countErrors,
+        wordMostErrors
+      );
     }
-
   }
-
 }
