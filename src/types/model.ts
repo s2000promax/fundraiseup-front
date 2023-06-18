@@ -1,6 +1,6 @@
 export type AnswersType = {
   isFinished: boolean;
-  answer: string;
+  answer: { text: string; isWrong: boolean };
   stepCounter: number;
   idError: { id: number; isWrong: boolean };
   errorCounter: number;

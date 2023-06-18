@@ -5,6 +5,7 @@ export class SimulatorModel {
   private size: number;
 
   private tasks: Task;
+  private isComplete: boolean;
   private currentTaskIndex: number;
 
   constructor(words: string[], size: number) {
@@ -16,6 +17,7 @@ export class SimulatorModel {
       answers: [],
       currentTask: 0,
     };
+    this.isComplete = false;
     this.currentTaskIndex = 0;
   }
 
@@ -30,7 +32,7 @@ export class SimulatorModel {
     for (let i = 0; i < this.size; i += 1) {
       answers.push({
         isFinished: false,
-        answer: '',
+        answer: { text: '', isWrong: false },
         stepCounter: 0,
         idError: { id: -1, isWrong: false },
         errorCounter: 0,
@@ -49,6 +51,14 @@ export class SimulatorModel {
 
   getTasks() {
     return this.tasks;
+  }
+
+  getCurrentTask() {
+    return this.tasks.currentTask;
+  }
+
+  getTasksSize() {
+    return this.size;
   }
 
   private getWords(originArray: Array<string>): Array<string> {
@@ -80,7 +90,7 @@ export class SimulatorModel {
     return mixedArray;
   }
 
-  changeCurrentTask(direct: string) {
+  changeCurrentTask(direct: string): number {
     if (direct === 'ArrowLeft') {
       if (this.tasks.currentTask > 1) {
         this.tasks.currentTask -= 1;
@@ -88,15 +98,18 @@ export class SimulatorModel {
     }
     if (direct === 'ArrowRight') {
       if (
-        this.tasks.currentTask < this.size &&
+        this.tasks.currentTask <= this.size &&
         this.tasks.answers[this.tasks.currentTask - 1].isFinished
       ) {
         this.tasks.currentTask += 1;
       }
     }
+
+    return this.tasks.currentTask;
   }
 
   checkAnswer(char: string, index: number): Task {
+    this.taskStatus(false);
     const currentIndex = this.tasks.currentTask - 1;
     const originalWord = this.tasks.wordsTasks[currentIndex];
     this.tasks.answers[currentIndex].idError = {
@@ -107,16 +120,16 @@ export class SimulatorModel {
     if (originalWord[this.tasks.answers[currentIndex].stepCounter] === char) {
       this.tasks.mixedTasks[currentIndex] = this.getNewMixedTask(
         this.tasks.mixedTasks[currentIndex],
-        char
+        char,
       );
 
-      this.tasks.answers[currentIndex].answer += char;
+      this.tasks.answers[currentIndex].answer.text += char;
       if (
-        this.tasks.answers[currentIndex].answer ===
+        this.tasks.answers[currentIndex].answer.text ===
         this.tasks.wordsTasks[currentIndex]
       ) {
         this.tasks.answers[currentIndex].isFinished = true;
-        this.tasks.currentTask += 1;
+        this.taskStatus(true);
       } else {
         this.tasks.answers[currentIndex].stepCounter += 1;
       }
@@ -127,11 +140,24 @@ export class SimulatorModel {
         isWrong: true,
       };
       if (this.tasks.answers[currentIndex].errorCounter > 2) {
-        this.tasks.currentTask += 1;
+        this.tasks.answers[currentIndex].answer = {
+          text: this.tasks.wordsTasks[currentIndex],
+          isWrong: true,
+        };
+        this.tasks.answers[currentIndex].isFinished = true;
+        this.tasks.mixedTasks[currentIndex] = '';
+        this.taskStatus(true);
       }
     }
 
     return this.tasks;
+  }
+
+  taskStatus(isComplete?: boolean) {
+    if (typeof isComplete !== 'undefined') {
+      this.isComplete = isComplete;
+    };
+    return this.isComplete;
   }
 
   private getNewMixedTask(mixedTask: string, char: string): string {
@@ -145,5 +171,9 @@ export class SimulatorModel {
 
   nextTask(): void {
     this.tasks.currentTask += 1;
+  }
+
+  getLetterIndex(letter: string): number {
+    return this.tasks.mixedTasks[this.tasks.currentTask - 1].split('').findIndex(el => el === letter);
   }
 }
