@@ -1,12 +1,11 @@
 import { AnswersType, Direction, Model, Task } from '@/types/model';
 
 export class SimulatorModel implements Model {
-  private words: string[];
-  private size: number;
-
-  private tasks: Task;
-  private isComplete: boolean;
-  private currentTaskIndex: number;
+  words: string[];
+  size: number;
+  tasks: Task;
+  isComplete: boolean;
+  currentTaskIndex: number;
 
   constructor(words: string[], size: number) {
     this.words = words;
@@ -57,43 +56,25 @@ export class SimulatorModel implements Model {
     return this.tasks.currentTask;
   }
 
+  prepareTaskForSave() {
+    this.tasks.answers.forEach((answer) => {
+      answer.idError = {
+        id: -1,
+        isWrong: false,
+      };
+    });
+    return this.tasks;
+  }
+
   getTasksSize() {
     return this.size;
   }
 
-  private getWords(originArray: Array<string>): Array<string> {
-    const tasksArray: Array<string> = [];
-
-    while (tasksArray.length < this.size) {
-      const index = Math.floor(Math.random() * originArray.length);
-      tasksArray.push(...originArray.splice(index, 1));
-    }
-
-    return tasksArray;
-  }
-
-  private mixArray(tasksArray: string[]) {
-    const mixedArray: Array<string> = [];
-
-    tasksArray.forEach((item) => {
-      const itemArray = item.split('');
-      const mixedWordArray = [];
-
-      while (itemArray.length) {
-        const index = Math.floor(Math.random() * itemArray.length);
-        mixedWordArray.push(...itemArray.splice(index, 1));
-      }
-
-      mixedArray.push(mixedWordArray.join(''));
-    });
-
-    return mixedArray;
-  }
-
-  changeCurrentTask(direct: Direction): number {
+  changeCurrentTask(direct: Direction) {
     if (direct === 'ArrowLeft') {
       if (this.tasks.currentTask > 1) {
-        this.tasks.currentTask -= 1;
+        this.tasks.currentTask -=
+          this.tasks.currentTask > this.getTasksSize() ? 2 : 1;
       }
     }
     if (direct === 'ArrowRight') {
@@ -108,7 +89,7 @@ export class SimulatorModel implements Model {
     return this.tasks.currentTask;
   }
 
-  checkAnswer(char: string, index: number): Task {
+  checkAnswer(char: string, index: number) {
     this.taskStatus(false);
     const currentIndex = this.tasks.currentTask - 1;
     const originalWord = this.tasks.wordsTasks[currentIndex];
@@ -160,6 +141,16 @@ export class SimulatorModel implements Model {
     return this.isComplete;
   }
 
+  nextTask() {
+    this.tasks.currentTask += 1;
+  }
+
+  getLetterIndex(letter: string) {
+    return this.tasks.mixedTasks[this.tasks.currentTask - 1]
+      .split('')
+      .findIndex((el) => el === letter);
+  }
+
   private getNewMixedTask(mixedTask: string, char: string): string {
     const index = mixedTask.indexOf(char);
     if (index !== -1) {
@@ -169,13 +160,32 @@ export class SimulatorModel implements Model {
     return mixedTask;
   }
 
-  nextTask(): void {
-    this.tasks.currentTask += 1;
+  private getWords(originArray: string[]): string[] {
+    const tasksArray: string[] = [];
+
+    while (tasksArray.length < this.size) {
+      const index = Math.floor(Math.random() * originArray.length);
+      tasksArray.push(...originArray.splice(index, 1));
+    }
+
+    return tasksArray;
   }
 
-  getLetterIndex(letter: string): number {
-    return this.tasks.mixedTasks[this.tasks.currentTask - 1]
-      .split('')
-      .findIndex((el) => el === letter);
+  private mixArray(tasksArray: string[]): string[] {
+    const mixedArray: string[] = [];
+
+    tasksArray.forEach((item) => {
+      const itemArray = item.split('');
+      const mixedWordArray = [];
+
+      while (itemArray.length) {
+        const index = Math.floor(Math.random() * itemArray.length);
+        mixedWordArray.push(...itemArray.splice(index, 1));
+      }
+
+      mixedArray.push(mixedWordArray.join(''));
+    });
+
+    return mixedArray;
   }
 }
