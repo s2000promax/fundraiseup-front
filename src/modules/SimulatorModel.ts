@@ -49,12 +49,22 @@ export class SimulatorModel implements Model {
     return this.tasks;
   }
 
-  getTasks() {
+  getTasks(): Task {
     return this.tasks;
   }
 
-  getCurrentTask() {
+  getCurrentTask(): number {
     return this.tasks.currentTask;
+  }
+
+  prepareTaskForSave(): Task {
+    this.tasks.answers.forEach((answer) => {
+      answer.idError = {
+        id: -1,
+        isWrong: false,
+      };
+    });
+    return this.tasks;
   }
 
   getTasksSize() {
@@ -93,7 +103,8 @@ export class SimulatorModel implements Model {
   changeCurrentTask(direct: Direction): number {
     if (direct === 'ArrowLeft') {
       if (this.tasks.currentTask > 1) {
-        this.tasks.currentTask -= 1;
+        this.tasks.currentTask -=
+          this.tasks.currentTask > this.getTasksSize() ? 2 : 1;
       }
     }
     if (direct === 'ArrowRight') {

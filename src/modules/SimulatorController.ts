@@ -24,7 +24,7 @@ export class SimulatorController implements Controller {
     this.view.registerSymbolClickHandler(this.handleClickEvent.bind(this));
     this.view.registerKeyboardClickHandler(this.handleClickEvent.bind(this));
 
-    if (this.savedTask) {
+    if (this.isFinishedTasks(this.savedTask)) {
       this.view.beforeStart()
         ? this.view.render(this.model.createTasks(this.savedTask))
         : this.view.render(this.model.createTasks(undefined));
@@ -35,7 +35,7 @@ export class SimulatorController implements Controller {
 
   handleClickEvent(event: string | KeyboardEvent, index?: number): void {
     if (typeof event === 'string') {
-      this.saveCurrentTasks(event, index);
+      this.model.checkAnswer(event, index!);
       this.checkingNextTask(this.model.getTasks());
     } else {
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
@@ -52,7 +52,7 @@ export class SimulatorController implements Controller {
         !this.isFinishedCurrentTask()
       ) {
         const letterIndex = this.model.getLetterIndex(event.key);
-        this.saveCurrentTasks(event.key, letterIndex);
+        this.model.checkAnswer(event.key, letterIndex);
         this.checkingNextTask(this.model.getTasks());
       }
     }
@@ -67,6 +67,7 @@ export class SimulatorController implements Controller {
       this.renderTasks();
       setTimeout(() => {
         this.model.nextTask();
+        this.saveCurrentTasks(this.model.prepareTaskForSave());
         if (this.isFinishedTasks()) {
           this.renderTasks();
         } else {
@@ -75,6 +76,7 @@ export class SimulatorController implements Controller {
       }, 1000);
     } else {
       this.renderTasks();
+      this.saveCurrentTasks(this.model.prepareTaskForSave());
     }
   }
 
@@ -87,12 +89,16 @@ export class SimulatorController implements Controller {
       .isFinished;
   }
 
-  private isFinishedTasks() {
+  private isFinishedTasks(savedTask?: Task | undefined) {
+    if (typeof savedTask !== 'undefined') {
+      return savedTask.currentTask <= this.model.getTasksSize();
+    }
+
     return this.model.getCurrentTask() <= this.model.getTasksSize();
   }
 
-  private saveCurrentTasks(key: string, index: number = -1) {
-    const tasksToSave = this.model.checkAnswer(key, index);
+  private saveCurrentTasks(tasksToSave: Task) {
+    // const tasksToSave = this.model.checkAnswer(key, index);
     this.storage.saveToLocalStorage('tasks', tasksToSave);
   }
 
