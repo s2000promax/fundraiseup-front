@@ -8,9 +8,9 @@ import { Controller } from '@/types/controller';
 export class SimulatorController implements Controller {
   view: SimulatorDOMView;
   model: SimulatorModel;
-  private storage: Storage;
-  private savedTask: Task | undefined;
-  private statistics: Statistics;
+  storage: Storage;
+  savedTask: Task | undefined;
+  statistics: Statistics;
 
   constructor(words: string[], size: number) {
     this.storage = new Storage();
@@ -20,7 +20,7 @@ export class SimulatorController implements Controller {
     this.statistics = new Statistics();
   }
 
-  start(): void {
+  start() {
     this.view.registerSymbolClickHandler(this.handleClickEvent.bind(this));
     this.view.registerKeyboardClickHandler(this.handleClickEvent.bind(this));
 
@@ -33,7 +33,7 @@ export class SimulatorController implements Controller {
     }
   }
 
-  handleClickEvent(event: string | KeyboardEvent, index?: number): void {
+  handleClickEvent(event: string | KeyboardEvent, index?: number) {
     if (typeof event === 'string') {
       this.model.checkAnswer(event, index!);
       this.checkingNextTask(this.model.getTasks());
@@ -62,7 +62,7 @@ export class SimulatorController implements Controller {
     }
   }
 
-  private checkingNextTask(tasks: Task) {
+  checkingNextTask(tasks: Task) {
     if (this.model.taskStatus()) {
       this.renderTasks();
       setTimeout(() => {
@@ -80,8 +80,21 @@ export class SimulatorController implements Controller {
     }
   }
 
-  private renderTasks() {
+  renderTasks() {
     this.view.render(this.model.getTasks());
+  }
+
+  renderStatistics(tasks: Task) {
+    this.view.renderStatistics(
+      this.statistics.getWordsWithoutErrors(tasks),
+      this.statistics.getCountErrors(tasks),
+      this.statistics.getWordsMostErrors(tasks)
+    );
+  }
+
+  saveCurrentTasks(tasksToSave: Task) {
+    // const tasksToSave = this.model.checkAnswer(key, index);
+    this.storage.saveToLocalStorage('tasks', tasksToSave);
   }
 
   private isFinishedCurrentTask() {
@@ -95,18 +108,5 @@ export class SimulatorController implements Controller {
     }
 
     return this.model.getCurrentTask() <= this.model.getTasksSize();
-  }
-
-  private saveCurrentTasks(tasksToSave: Task) {
-    // const tasksToSave = this.model.checkAnswer(key, index);
-    this.storage.saveToLocalStorage('tasks', tasksToSave);
-  }
-
-  private renderStatistics(tasks: Task) {
-    this.view.renderStatistics(
-      this.statistics.getWordsWithoutErrors(tasks),
-      this.statistics.getCountErrors(tasks),
-      this.statistics.getWordsMostErrors(tasks)
-    );
   }
 }

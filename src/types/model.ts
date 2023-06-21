@@ -15,4 +15,21 @@ export interface Task {
 
 export type Direction = 'ArrowLeft' | 'ArrowRight';
 
-export interface Model {}
+export interface Model {
+  words: string[];
+  size: number;
+  tasks: Task;
+  isComplete: boolean;
+  currentTaskIndex: number;
+
+  createTasks(savedTask: Task | undefined): Task;
+  checkAnswer(char: string, index: number): Task;
+  getTasks(): Task;
+  prepareTaskForSave(): Task;
+  getTasksSize(): number;
+  getCurrentTask(): number;
+  changeCurrentTask(direct: Direction): number;
+  getLetterIndex(letter: string): number;
+  taskStatus(isComplete?: boolean): boolean;
+  nextTask(): void;
+}
