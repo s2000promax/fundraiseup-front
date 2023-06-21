@@ -7,7 +7,7 @@ import { buildDevServer } from './buildDevServer';
 
 export function buildWebpackConfig(options: BuildOptions): Configuration {
   const { paths, mode, isDev } = options;
-  console.log(paths.build);
+
   return {
     mode,
     entry: {
